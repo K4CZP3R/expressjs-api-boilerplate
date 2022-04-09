@@ -4,7 +4,7 @@
 
 Backend boilerplate used by me, it contains the following functionality:
 
-**MongoDB** / **JWT** / **Docker** / **Tests**
+**MongoDB** / **JWT** / **Docker** / **Tests** / **TypeScript**
 
 </div>
 
