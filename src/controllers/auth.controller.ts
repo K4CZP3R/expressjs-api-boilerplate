@@ -8,22 +8,6 @@ import { BaseController } from "./base.controller";
 export class AuthController extends BaseController {
 	routes: IRoute[] = [
 		{
-			path: "/email/register",
-			method: "POST",
-			func: this.pathEmailRegister.bind(this),
-		},
-		{
-			path: "/email",
-			method: "POST",
-			func: this.pathEmailAuth.bind(this),
-		},
-		{
-			path: "/refresh",
-			method: "GET",
-			func: this.pathRefresh.bind(this),
-			middlewares: [authUserMiddleware],
-		},
-		{
 			path: "/me",
 			method: "GET",
 			func: this.pathMe.bind(this),
@@ -38,22 +22,6 @@ export class AuthController extends BaseController {
 
 	async pathMe(req: Request, res: Response, next: NextFunction) {
 		let result = await this.authLogic.meData({ user: req["user"] });
-		res.json(result);
-	}
-
-	async pathRefresh(req: Request, res: Response, next: NextFunction) {
-		let result = await this.authLogic.refreshToken({ user: req["user"] });
-		res.json(result);
-	}
-
-	async pathEmailAuth(req: Request, res: Response, next: NextFunction) {
-		let result = await this.authLogic.authenticateUsingEmail(req.body);
-		res.json(result);
-	}
-
-	async pathEmailRegister(req: Request, res: Response, next: NextFunction) {
-		let result = await this.authLogic.registerUsingEmail(req.body);
-
 		res.json(result);
 	}
 }
