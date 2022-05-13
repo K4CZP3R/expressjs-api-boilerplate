@@ -46,7 +46,9 @@ export class App {
 			new JwtSessionService({
 				privateKey: keypair.private,
 				publicKey: keypair.public,
-				expiresIn: 60 * 60 * 24,
+				// expiresIn: 60 * 60 * 24,
+				expiresIn: 60 * 15, // 15 minutes
+				refreshExpiresIn: 60 * 60 * 24 * 7, // 7 days
 				issuer: "KSP",
 			})
 		);

@@ -1,12 +1,17 @@
 import { NextFunction, Response, Request } from "express";
 import { checkValues } from "../helpers/type-checker.helper";
 import { AuthLogic } from "../logic/auth.logic";
-import { authUserMiddleware } from "../middlewares/auth.middleware";
+import { authRefreshMiddleware, authUserMiddleware } from "../middlewares/auth.middleware";
 import { IRoute } from "../models/interfaces/route.interface";
 import { BaseController } from "./base.controller";
 
 export class AuthController extends BaseController {
 	routes: IRoute[] = [
+		{
+			path: "/jwks",
+			method: "GET",
+			func: this.pathJwks.bind(this),
+		},
 		{
 			path: "/email/register",
 			method: "POST",
@@ -21,7 +26,7 @@ export class AuthController extends BaseController {
 			path: "/refresh",
 			method: "GET",
 			func: this.pathRefresh.bind(this),
-			middlewares: [authUserMiddleware],
+			middlewares: [authRefreshMiddleware],
 		},
 		{
 			path: "/me",
@@ -54,6 +59,11 @@ export class AuthController extends BaseController {
 	async pathEmailRegister(req: Request, res: Response, next: NextFunction) {
 		let result = await this.authLogic.registerUsingEmail(req.body);
 
+		res.json(result);
+	}
+
+	async pathJwks(req: Request, res: Response, next: NextFunction) {
+		let result = await this.authLogic.getJwks();
 		res.json(result);
 	}
 }

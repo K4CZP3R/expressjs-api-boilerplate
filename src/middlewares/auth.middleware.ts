@@ -6,7 +6,7 @@ import { UserRepository } from "../repositories/user.repository";
 import { DependencyProviderService } from "../services/dependency-provider.service";
 import { JwtSessionService } from "../services/jwt-session.service";
 
-export function authUserMiddleware(req: Request, res: Response, next: NextFunction) {
+function authMiddleware(req: Request, res: Response, next: NextFunction) {
 	let authHeader = req.get("Authorization");
 
 	if (authHeader === undefined) {
@@ -23,7 +23,36 @@ export function authUserMiddleware(req: Request, res: Response, next: NextFuncti
 	} catch (e: any) {
 		return next(new HttpException(401, "Token malformed! " + e.message));
 	}
+
+	return session;
+}
+
+export function authUserMiddleware(req: Request, res: Response, next: NextFunction) {
+	const session = authMiddleware(req, res, next);
+	if (typeof session === "undefined") return;
+
+	if (session.type !== "user") {
+		return next(new HttpException(401, "Invalid token type!"));
+	}
 	req["userSession"] = session;
+	new UserRepository()
+		.getUserById(session.id)
+		.then(user => {
+			req["user"] = user;
+			return next();
+		})
+		.catch(e => {
+			return next(new HttpException(500, "something went wrong!"));
+		});
+}
+export function authRefreshMiddleware(req: Request, res: Response, next: NextFunction) {
+	const session = authMiddleware(req, res, next);
+	if (typeof session === "undefined") return;
+
+	if (session.type !== "refresh") {
+		return next(new HttpException(401, "Invalid token type!"));
+	}
+	req["refreshSession"] = session;
 	new UserRepository()
 		.getUserById(session.id)
 		.then(user => {

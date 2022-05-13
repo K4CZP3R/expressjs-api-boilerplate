@@ -3,7 +3,15 @@ import { readFileSync } from "fs";
 import { ISession } from "../models/interfaces/session.interface";
 
 export class JwtSessionService {
-	constructor(private config: { privateKey: string; publicKey: string; expiresIn: number; issuer: string }) {}
+	constructor(
+		private config: {
+			privateKey: string;
+			publicKey: string;
+			expiresIn: number;
+			refreshExpiresIn: number;
+			issuer: string;
+		}
+	) {}
 
 	signSession(session: ISession): string {
 		return jwt.sign(session, this.config.privateKey, {
@@ -11,6 +19,20 @@ export class JwtSessionService {
 			expiresIn: this.config.expiresIn,
 			issuer: this.config.issuer,
 		});
+	}
+	signRefresh(session: ISession): string {
+		return jwt.sign(session, this.config.privateKey, {
+			algorithm: "RS512",
+			expiresIn: this.config.refreshExpiresIn,
+			issuer: this.config.issuer,
+		});
+	}
+
+	getPublicKey(): string {
+		return this.config.publicKey;
+	}
+	getIssuer(): string {
+		return this.config.issuer;
 	}
 
 	verifySession(key: string): ISession {

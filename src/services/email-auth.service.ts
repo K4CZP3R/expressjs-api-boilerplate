@@ -10,7 +10,10 @@ export class EmailAuthService extends BaseAuthService {
 		super();
 	}
 
-	async authenticate(data: { email: string; passwordEncoded: string }): Promise<IResult<{ token: string }>> {
+	async authenticate(data: {
+		email: string;
+		passwordEncoded: string;
+	}): Promise<IResult<{ accessToken: string; refreshToken: string }>> {
 		let auth = await this.AuthRepo.getAuthByMail(data.email);
 		if (!auth) {
 			throw new Error("Email/password combination is not valid!");
@@ -31,7 +34,7 @@ export class EmailAuthService extends BaseAuthService {
 		return {
 			success: true,
 			message: "Authorized!",
-			data: { token: token },
+			data: { accessToken: token.accessToken, refreshToken: token.refreshToken },
 		};
 	}
 

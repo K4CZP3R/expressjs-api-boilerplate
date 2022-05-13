@@ -26,11 +26,17 @@ export class BaseAuthService {
 		return await this.userRepository.getUserById(data.id);
 	}
 
-	async createSession(data: { user: IUser }): Promise<string> {
-		let session: ISession = {
-			id: data.user._id,
+	async createSession(data: { user: IUser }): Promise<{ accessToken: string; refreshToken: string }> {
+		return {
+			accessToken: this.jwtSessionService.signSession({ id: data.user._id, type: "user" }),
+			refreshToken: this.jwtSessionService.signRefresh({ id: data.user._id, type: "refresh" }),
 		};
+	}
 
-		return this.jwtSessionService.signSession(session);
+	async getPublicJwtInfo(): Promise<{ pubKey: string; issuer: string }> {
+		return {
+			pubKey: this.jwtSessionService.getPublicKey(),
+			issuer: this.jwtSessionService.getIssuer(),
+		};
 	}
 }

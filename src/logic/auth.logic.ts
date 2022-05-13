@@ -6,7 +6,12 @@ import { IUser } from "../models/user.model";
 
 export class AuthLogic {
 	constructor(private emailAuth = new EmailAuthService(), private baseAuth = new BaseAuthService()) {}
-
+	async getJwks(): Promise<IResult<{ pubKey: string; issuer: string }>> {
+		return {
+			success: true,
+			data: await this.baseAuth.getPublicJwtInfo(),
+		};
+	}
 	async authenticateUsingEmail(data: { email: string; passwordEncoded: string }): Promise<IResult<{ token: string }>> {
 		checkValues(data, { shouldContainKeys: ["email", "passwordEncoded"] });
 
@@ -17,17 +22,17 @@ export class AuthLogic {
 		return { success: true, data: { user: data.user } };
 	}
 
-	async refreshToken(data: { user: IUser }): Promise<IResult<{ token: string }>> {
+	async refreshToken(data: { user: IUser }): Promise<IResult<{ accessToken: string; refreshToken: string }>> {
 		let newSession = await this.baseAuth.createSession({ user: data.user });
 
-		return { success: true, data: { token: newSession } };
+		return { success: true, data: { accessToken: newSession.accessToken, refreshToken: newSession.refreshToken } };
 	}
 
 	async registerUsingEmail(data: {
 		email: string;
 		passwordEncoded: string;
 		username: string;
-	}): Promise<IResult<string>> {
+	}): Promise<IResult<{ accessToken: string; refreshToken: string }>> {
 		checkValues(data, { shouldContainKeys: ["email", "passwordEncoded", "username"], checkRuleChangeableValues: true });
 		return await this.emailAuth.register(data);
 	}
