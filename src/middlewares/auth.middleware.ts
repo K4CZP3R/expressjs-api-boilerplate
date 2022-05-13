@@ -24,13 +24,6 @@ export function authUserMiddleware(req: Request, res: Response, next: NextFuncti
 		return next(new HttpException(401, "Token malformed! " + e.message));
 	}
 	req["userSession"] = session;
-	new UserRepository()
-		.getUserById(session.id)
-		.then(user => {
-			req["user"] = user;
-			return next();
-		})
-		.catch(e => {
-			return next(new HttpException(500, "something went wrong!"));
-		});
+	req["user"] = session.user;
+	return next();
 }
