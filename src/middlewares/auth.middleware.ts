@@ -1,8 +1,7 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { JWT_SERVICE } from "../helpers/di-names.helper";
 import { HttpException } from "../models/exceptions/http.exception";
 import { ISession } from "../models/interfaces/session.interface";
-import { UserRepository } from "../repositories/user.repository";
 import { DependencyProviderService } from "../services/dependency-provider.service";
 import { JwtSessionService } from "../services/jwt-session.service";
 
