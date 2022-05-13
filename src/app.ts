@@ -26,28 +26,28 @@ export class App {
 				console.log("App bootstrapped!");
 			})
 			.catch((e: any) => {
-				console.error("Something went wrong while bootstrapping", e);
+				console.error("Something went wrong while bootstrapping", e.message);
 			});
 	}
 
 	private async bootstrapApp() {
 		const env = getEnvironment();
-		this.setupDi(env);
+		await this.setupDi(env);
 		if (env.isDev()) await this.seedDatabaseInDev();
 		this.setupMiddlewares();
 		this.setupControllers();
 		this.setupAfterMiddlewares();
 	}
 
-	private setupDi(env: Environment) {
-		let keypair = env.getJwtKeyPair();
+	private async setupDi(env: Environment) {
+		let jwksData = await JwtSessionService.getJwks(env.getJwksEndpoint());
+		if (jwksData === undefined) throw new Error("Could not fetch JWKS data! " + env.getJwksEndpoint());
+
 		DependencyProviderService.setImpl<JwtSessionService>(
 			JWT_SERVICE,
 			new JwtSessionService({
-				privateKey: keypair.private,
-				publicKey: keypair.public,
-				expiresIn: 60 * 60 * 24,
-				issuer: "KSP",
+				publicKey: jwksData.pubKey,
+				issuer: jwksData.issuer,
 			})
 		);
 
