@@ -10,9 +10,7 @@ export interface IEnvironment {
 	DB_USER: string;
 	DB_PASS: string;
 	DB_NAME: string;
-
-	JWT_KEY_PRIVATE: string;
-	JWT_KEY_PUBLIC: string;
+	JWKS_ENDPOINT: string;
 }
 
 /**
@@ -32,6 +30,5 @@ export const IEnvironmentKeys: KeysEnum<IEnvironment> = {
 	DB_PASS: true,
 	DB_NAME: true,
 
-	JWT_KEY_PRIVATE: true,
-	JWT_KEY_PUBLIC: true,
+	JWKS_ENDPOINT: true,
 };

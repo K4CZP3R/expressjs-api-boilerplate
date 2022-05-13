@@ -19,10 +19,7 @@ export class Environment {
 		return this.env.ENVIRONMENT === "dev";
 	}
 
-	getJwtKeyPair(): { private: string; public: string } {
-		return {
-			private: readFileSync(this.env.JWT_KEY_PRIVATE).toString(),
-			public: readFileSync(this.env.JWT_KEY_PUBLIC).toString(),
-		};
+	getJwksEndpoint(): string {
+		return this.env.JWKS_ENDPOINT;
 	}
 }
