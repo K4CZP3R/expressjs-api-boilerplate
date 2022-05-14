@@ -12,7 +12,10 @@ export class AuthLogic {
 			data: await this.baseAuth.getPublicJwtInfo(),
 		};
 	}
-	async authenticateUsingEmail(data: { email: string; passwordEncoded: string }): Promise<IResult<{ token: string }>> {
+	async authenticateUsingEmail(data: {
+		email: string;
+		passwordEncoded: string;
+	}): Promise<IResult<{ accessToken: string; refreshToken: string }>> {
 		checkValues(data, { shouldContainKeys: ["email", "passwordEncoded"] });
 
 		return await this.emailAuth.authenticate(data);
@@ -32,7 +35,7 @@ export class AuthLogic {
 		email: string;
 		passwordEncoded: string;
 		username: string;
-	}): Promise<IResult<{ accessToken: string; refreshToken: string }>> {
+	}): Promise<IResult<string>> {
 		checkValues(data, { shouldContainKeys: ["email", "passwordEncoded", "username"], checkRuleChangeableValues: true });
 		return await this.emailAuth.register(data);
 	}

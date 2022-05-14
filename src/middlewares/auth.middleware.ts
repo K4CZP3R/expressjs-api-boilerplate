@@ -6,7 +6,7 @@ import { UserRepository } from "../repositories/user.repository";
 import { DependencyProviderService } from "../services/dependency-provider.service";
 import { JwtSessionService } from "../services/jwt-session.service";
 
-function authMiddleware(req: Request, res: Response, next: NextFunction) {
+async function authMiddleware(req: Request, res: Response, next: NextFunction) {
 	let authHeader = req.get("Authorization");
 
 	if (authHeader === undefined) {
@@ -18,8 +18,9 @@ function authMiddleware(req: Request, res: Response, next: NextFunction) {
 	let jwtKey = authHeader.replace("Bearer ", "");
 
 	let session: ISession = undefined;
+
 	try {
-		session = DependencyProviderService.getImpl<JwtSessionService>(JWT_SERVICE).verifySession(jwtKey);
+		session = await DependencyProviderService.getImpl<JwtSessionService>(JWT_SERVICE).verifySession(jwtKey);
 	} catch (e: any) {
 		return next(new HttpException(401, "Token malformed! " + e.message));
 	}
@@ -27,8 +28,8 @@ function authMiddleware(req: Request, res: Response, next: NextFunction) {
 	return session;
 }
 
-export function authUserMiddleware(req: Request, res: Response, next: NextFunction) {
-	const session = authMiddleware(req, res, next);
+export async function authUserMiddleware(req: Request, res: Response, next: NextFunction) {
+	const session = await authMiddleware(req, res, next);
 	if (typeof session === "undefined") return;
 
 	if (session.type !== "user") {
@@ -45,8 +46,8 @@ export function authUserMiddleware(req: Request, res: Response, next: NextFuncti
 			return next(new HttpException(500, "something went wrong!"));
 		});
 }
-export function authRefreshMiddleware(req: Request, res: Response, next: NextFunction) {
-	const session = authMiddleware(req, res, next);
+export async function authRefreshMiddleware(req: Request, res: Response, next: NextFunction) {
+	const session = await authMiddleware(req, res, next);
 	if (typeof session === "undefined") return;
 
 	if (session.type !== "refresh") {

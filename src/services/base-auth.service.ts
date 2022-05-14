@@ -28,14 +28,14 @@ export class BaseAuthService {
 
 	async createSession(data: { user: IUser }): Promise<{ accessToken: string; refreshToken: string }> {
 		return {
-			accessToken: this.jwtSessionService.signSession({ id: data.user._id, type: "user" }),
-			refreshToken: this.jwtSessionService.signRefresh({ id: data.user._id, type: "refresh" }),
+			accessToken: await this.jwtSessionService.signSession({ id: data.user._id, type: "user", user: data.user }),
+			refreshToken: await this.jwtSessionService.signRefresh({ id: data.user._id, type: "refresh", user: data.user }),
 		};
 	}
 
 	async getPublicJwtInfo(): Promise<{ pubKey: string; issuer: string }> {
 		return {
-			pubKey: this.jwtSessionService.getPublicKey(),
+			pubKey: await this.jwtSessionService.getPublicJwk(),
 			issuer: this.jwtSessionService.getIssuer(),
 		};
 	}

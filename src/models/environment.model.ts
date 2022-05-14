@@ -19,10 +19,10 @@ export class Environment {
 		return this.env.ENVIRONMENT === "dev";
 	}
 
-	getJwtKeyPair(): { private: string; public: string } {
+	getJwkKeyPair(): { private: any; public: any } {
 		return {
-			private: readFileSync(this.env.JWT_KEY_PRIVATE).toString(),
-			public: readFileSync(this.env.JWT_KEY_PUBLIC).toString(),
+			private: JSON.parse(readFileSync(this.env.JWT_KEY_PRIVATE).toString()),
+			public: JSON.parse(readFileSync(this.env.JWT_KEY_PUBLIC).toString()),
 		};
 	}
 }

@@ -40,12 +40,12 @@ export class App {
 	}
 
 	private setupDi(env: Environment) {
-		let keypair = env.getJwtKeyPair();
+		let keypair = env.getJwkKeyPair();
 		DependencyProviderService.setImpl<JwtSessionService>(
 			JWT_SERVICE,
 			new JwtSessionService({
-				privateKey: keypair.private,
-				publicKey: keypair.public,
+				privateJwk: keypair.private,
+				publicJwk: keypair.public,
 				// expiresIn: 60 * 60 * 24,
 				expiresIn: 60 * 15, // 15 minutes
 				refreshExpiresIn: 60 * 60 * 24 * 7, // 7 days

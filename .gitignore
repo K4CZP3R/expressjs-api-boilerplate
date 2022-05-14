@@ -57,3 +57,5 @@ Thumbs.db
 *.key.pub
 
 .env
+
+*.jwk

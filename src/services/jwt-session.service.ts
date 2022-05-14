@@ -1,45 +1,52 @@
-import * as jwt from "jsonwebtoken";
-import { readFileSync } from "fs";
+// import * as jwt from "jsonwebtoken";
+import * as jose from "jose";
 import { ISession } from "../models/interfaces/session.interface";
 
 export class JwtSessionService {
+	private JWKS;
 	constructor(
 		private config: {
-			privateKey: string;
-			publicKey: string;
+			privateJwk: any;
+			publicJwk: any;
 			expiresIn: number;
 			refreshExpiresIn: number;
 			issuer: string;
 		}
-	) {}
-
-	signSession(session: ISession): string {
-		return jwt.sign(session, this.config.privateKey, {
-			algorithm: "RS512",
-			expiresIn: this.config.expiresIn,
-			issuer: this.config.issuer,
-		});
-	}
-	signRefresh(session: ISession): string {
-		return jwt.sign(session, this.config.privateKey, {
-			algorithm: "RS512",
-			expiresIn: this.config.refreshExpiresIn,
-			issuer: this.config.issuer,
-		});
+	) {
+		this.JWKS = jose.createLocalJWKSet({ keys: [config.publicJwk] });
+		jose.importJWK(this.config.privateJwk, "RS512").then(key => (this.config.privateJwk = key));
+		jose.importJWK(this.config.publicJwk, "RS512").then(key => (this.config.publicJwk = key));
 	}
 
-	getPublicKey(): string {
-		return this.config.publicKey;
+	async signSession(session: ISession): Promise<string> {
+		return await new jose.SignJWT({ session: session })
+			.setProtectedHeader({ alg: "RS512" })
+			.setIssuedAt()
+			.setIssuer(this.config.issuer)
+			.setExpirationTime(`${this.config.expiresIn}s`)
+			.sign(this.config.privateJwk);
+	}
+	async signRefresh(session: ISession): Promise<string> {
+		return await new jose.SignJWT({ session: session })
+			.setProtectedHeader({ alg: "RS512" })
+			.setIssuedAt()
+			.setIssuer(this.config.issuer)
+			.setExpirationTime(`${this.config.refreshExpiresIn}s`)
+			.sign(this.config.privateJwk);
+	}
+
+	async getPublicJwk(): Promise<any> {
+		return await jose.exportJWK(this.config.publicJwk);
 	}
 	getIssuer(): string {
 		return this.config.issuer;
 	}
 
-	verifySession(key: string): ISession {
-		return jwt.verify(key, this.config.publicKey, {
-			algorithms: ["RS512"],
-			ignoreExpiration: false,
+	async verifySession(key: string): Promise<ISession> {
+		const { payload } = await jose.jwtVerify(key, this.JWKS, {
 			issuer: this.config.issuer,
-		}) as ISession;
+		});
+
+		return payload.session as ISession;
 	}
 }
