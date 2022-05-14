@@ -6,11 +6,8 @@ import { IUser } from "../models/user.model";
 
 export class AuthLogic {
 	constructor(private emailAuth = new EmailAuthService(), private baseAuth = new BaseAuthService()) {}
-	async getJwks(): Promise<IResult<{ pubKey: string; issuer: string }>> {
-		return {
-			success: true,
-			data: await this.baseAuth.getPublicJwtInfo(),
-		};
+	async getJwks(): Promise<{ keys: any[] }> {
+		return await this.baseAuth.getPublicJwtInfo();
 	}
 	async authenticateUsingEmail(data: {
 		email: string;

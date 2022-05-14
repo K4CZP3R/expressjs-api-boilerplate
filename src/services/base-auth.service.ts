@@ -33,10 +33,9 @@ export class BaseAuthService {
 		};
 	}
 
-	async getPublicJwtInfo(): Promise<{ pubKey: string; issuer: string }> {
+	async getPublicJwtInfo(): Promise<{ keys: any[] }> {
 		return {
-			pubKey: await this.jwtSessionService.getPublicJwk(),
-			issuer: this.jwtSessionService.getIssuer(),
+			keys: [await this.jwtSessionService.getPublicJwk()],
 		};
 	}
 }
