@@ -5,7 +5,7 @@ import { ISession } from "../models/interfaces/session.interface";
 import { DependencyProviderService } from "../services/dependency-provider.service";
 import { JwtSessionService } from "../services/jwt-session.service";
 
-export function authUserMiddleware(req: Request, res: Response, next: NextFunction) {
+export async function authUserMiddleware(req: Request, res: Response, next: NextFunction) {
 	let authHeader = req.get("Authorization");
 
 	if (authHeader === undefined) {
@@ -18,7 +18,7 @@ export function authUserMiddleware(req: Request, res: Response, next: NextFuncti
 
 	let session: ISession = undefined;
 	try {
-		session = DependencyProviderService.getImpl<JwtSessionService>(JWT_SERVICE).verifySession(jwtKey);
+		session = await DependencyProviderService.getImpl<JwtSessionService>(JWT_SERVICE).verifySession(jwtKey);
 	} catch (e: any) {
 		return next(new HttpException(401, "Token malformed! " + e.message));
 	}

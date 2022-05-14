@@ -40,14 +40,11 @@ export class App {
 	}
 
 	private async setupDi(env: Environment) {
-		let jwksData = await JwtSessionService.getJwks(env.getJwksEndpoint());
-		if (jwksData === undefined) throw new Error("Could not fetch JWKS data! " + env.getJwksEndpoint());
-
 		DependencyProviderService.setImpl<JwtSessionService>(
 			JWT_SERVICE,
 			new JwtSessionService({
-				publicKey: jwksData.pubKey,
-				issuer: jwksData.issuer,
+				jwkEndpoint: env.getJwksEndpoint(),
+				issuer: "KSP",
 			})
 		);
 

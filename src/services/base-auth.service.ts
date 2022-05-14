@@ -5,6 +5,4 @@ import { JwtSessionService } from "./jwt-session.service";
 export class BaseAuthService {
 	@Inject<JwtSessionService>(JWT_SERVICE)
 	jwtSessionService!: JwtSessionService;
-
-	constructor() {}
 }
