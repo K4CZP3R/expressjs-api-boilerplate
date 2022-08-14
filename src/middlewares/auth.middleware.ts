@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { JWT_SERVICE } from "../helpers/di-names.helper";
+import { AccountType } from "../models/enums/account-type.enum";
 import { HttpException } from "../models/exceptions/http.exception";
 import { ISession } from "../models/interfaces/session.interface";
 import { UserRepository } from "../repositories/user.repository";
@@ -29,15 +30,17 @@ async function authMiddleware(req: Request, res: Response, next: NextFunction) {
 }
 
 export async function authUserMiddleware(req: Request, res: Response, next: NextFunction) {
+	if (req["user"]) {
+		return next();
+	}
 	const session = await authMiddleware(req, res, next);
 	if (typeof session === "undefined") return;
 
 	if (session.type !== "user") {
 		return next(new HttpException(401, "Invalid token type!"));
 	}
-	req["userSession"] = session;
 	new UserRepository()
-		.getUserById(session.id)
+		.getById(session.id)
 		.then(user => {
 			req["user"] = user;
 			return next();
@@ -53,9 +56,8 @@ export async function authRefreshMiddleware(req: Request, res: Response, next: N
 	if (session.type !== "refresh") {
 		return next(new HttpException(401, "Invalid token type!"));
 	}
-	req["refreshSession"] = session;
 	new UserRepository()
-		.getUserById(session.id)
+		.getById(session.id)
 		.then(user => {
 			req["user"] = user;
 			return next();
