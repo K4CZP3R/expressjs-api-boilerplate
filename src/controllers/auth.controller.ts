@@ -1,7 +1,6 @@
 import { NextFunction, Response, Request } from "express";
-import { checkValues } from "../helpers/type-checker.helper";
 import { AuthLogic } from "../logic/auth.logic";
-import { authRefreshMiddleware, authUserMiddleware } from "../middlewares/auth.middleware";
+import { authRefreshMiddleware, authUserMiddleware, authUserTypeMiddleware } from "../middlewares/auth.middleware";
 import { IRoute } from "../models/interfaces/route.interface";
 import { BaseController } from "./base.controller";
 
@@ -36,10 +35,23 @@ export class AuthController extends BaseController {
 		},
 	];
 
+	private _registerDisabled: boolean = false;
+
+
 	constructor(private authLogic: AuthLogic = new AuthLogic()) {
 		super({ path: "/auth" });
 		this.loadRoutes();
 	}
+
+	// setter for registerDisabled
+	get registerDisabled(): boolean {
+		return this._registerDisabled;
+	}
+
+	set registerDisabled(value: boolean) {
+		this._registerDisabled = value;
+	}
+
 
 	async pathMe(req: Request, res: Response, next: NextFunction) {
 		let result = await this.authLogic.meData({ user: req["user"] });
@@ -57,6 +69,7 @@ export class AuthController extends BaseController {
 	}
 
 	async pathEmailRegister(req: Request, res: Response, next: NextFunction) {
+		if (this.registerDisabled) throw new Error("Registration is disabled!");
 		let result = await this.authLogic.registerUsingEmail(req.body);
 
 		res.json(result);

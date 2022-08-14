@@ -10,6 +10,7 @@ async function main() {
 
 	await writeFile("public.jwk", JSON.stringify(publicJwk, null, 2));
 	await writeFile("private.jwk", JSON.stringify(privateJwk, null, 2));
+	console.log("Generated!")
 }
 
 main();

@@ -1,6 +1,21 @@
 import { IResult } from "../models/interfaces/result.interface";
-import { isAllowedUsername, isValidEmail, isValidUUID } from "./input-validator.helper";
+import {
+	isAllowedUsername,
+	isValidEmail,
+	isValidUUID,
+} from "./input-validator.helper";
 import { isStrongEncodedPassword, isStrongPassword } from "./password.helper";
+
+export function anyIsArray(input: any) {
+	return Array.isArray(input);
+}
+export function anyIsType(input: any, type: string) {
+	return typeof input === type;
+}
+
+export function anysAreType(input: any[], type: string) {
+	return input.every(i => typeof i === type);
+}
 
 export function checkValues(
 	dataIn: any,
@@ -40,6 +55,7 @@ export function checkValues(
 						: { success: false, message: "Invalid data (username)" };
 				}
 				break;
+
 			default:
 				if (key.toLowerCase().includes("id")) {
 					result = dataIn[key] ? isValidUUID(dataIn[key]) : { success: false, message: "Invalid data (id)" };
@@ -54,7 +70,6 @@ export function checkValues(
 		}
 		if (!result.success) {
 			//TODO: Something wrong with uuid check
-			// console.log("throwing!", result.message);
 			throw new Error(result.message);
 		}
 		return;

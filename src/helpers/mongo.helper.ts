@@ -3,7 +3,9 @@ import { v4 as uuid } from "uuid";
 import { generateNumberBetween } from "./secure.helper";
 
 export function configToMongoUrl(databaseConfig: IDatabaseConfig) {
-	if (databaseConfig.username && databaseConfig.password) {
+	if (databaseConfig.url) {
+		return databaseConfig.url;
+	} else if (databaseConfig.username && databaseConfig.password) {
 		return `mongodb://${databaseConfig.username}:${databaseConfig.password}@${databaseConfig.hostname}:${databaseConfig.port}/${databaseConfig.databaseName}`;
 	} else {
 		return `mongodb://${databaseConfig.hostname}:${databaseConfig.port}/${databaseConfig.databaseName}`;

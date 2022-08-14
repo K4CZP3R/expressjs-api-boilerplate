@@ -10,20 +10,20 @@ export class BaseAuthService {
 	@Inject<JwtSessionService>(JWT_SERVICE)
 	jwtSessionService!: JwtSessionService;
 
-	constructor(public AuthRepo: AuthRepository = new AuthRepository(), public userRepository = new UserRepository()) {}
+	constructor(public AuthRepo: AuthRepository = new AuthRepository(), public userRepository = new UserRepository()) { }
 
 	async createUser(data: { name: string }): Promise<IUser> {
-		return await this.userRepository.createUser({
+		return await this.userRepository.addObject({
 			name: data.name,
 		});
 	}
 
 	async updateUser(data: { user: IUser }): Promise<IUser> {
-		return await this.userRepository.updateUser(data.user);
+		return await this.userRepository.update(data.user._id, data.user);
 	}
 
 	async getUser(data: { id: string }): Promise<IUser> {
-		return await this.userRepository.getUserById(data.id);
+		return await this.userRepository.getById(data.id);
 	}
 
 	async createSession(data: { user: IUser }): Promise<{ accessToken: string; refreshToken: string }> {

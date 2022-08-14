@@ -57,8 +57,6 @@ export function isStrongEncodedPassword(passwordEncoded: string): IResult<undefi
 
 export function hashPassword(passwordEncoded: string): string {
 	var password = Buffer.from(passwordEncoded, "base64").toString("utf8");
-
-	console.log("plain password", password);
 	const hash = new SHA3(512);
 	hash.update(password);
 	return hash.digest("base64");
