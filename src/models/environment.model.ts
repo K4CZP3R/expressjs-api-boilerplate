@@ -3,7 +3,7 @@ import { IDatabaseConfig } from "./interfaces/orm-database-config.interface";
 import { read, readFileSync } from "fs";
 
 export class Environment {
-	constructor(public env: IEnvironment) {}
+	constructor(public env: IEnvironment) { }
 
 	getDatabase(): IDatabaseConfig {
 		return {
@@ -12,12 +12,19 @@ export class Environment {
 			databaseName: this.env.DB_NAME,
 			password: this.env.DB_PASS,
 			port: this.env.DB_PORT,
+			url: this.env.DB_URL,
 		};
 	}
 
 	isDev(): boolean {
 		return this.env.ENVIRONMENT === "dev";
 	}
+
+
+
+
+
+
 
 	getJwkKeyPair(): { private: any; public: any } {
 		return {
