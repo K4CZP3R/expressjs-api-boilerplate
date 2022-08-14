@@ -66,3 +66,17 @@ export async function authRefreshMiddleware(req: Request, res: Response, next: N
 			return next(new HttpException(500, "something went wrong!"));
 		});
 }
+
+
+export function authUserTypeMiddleware(accountType: AccountType) {
+	return function (req: Request, res: Response, next: NextFunction) {
+		if (!req['user']) return next(new HttpException(500, "Something went wrong!"));
+
+		if (req['user'].accountType !== accountType) {
+			return next(new HttpException(401, "Unauthorized!"));
+		}
+
+		return next();
+	}
+
+}
