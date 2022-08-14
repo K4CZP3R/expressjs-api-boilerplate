@@ -12,28 +12,37 @@ import { configToMongoUrl } from "./helpers/mongo.helper";
 import { JwtSessionService } from "./services/jwt-session.service";
 import { Environment } from "./models/environment.model";
 import { AuthController } from "./controllers/auth.controller";
+import { getDebug } from "./helpers/debug.helper";
 
 export class App {
 	public app: express.Express;
 
 	private controllers: IController[] = [new AuthController()];
+	debug: debug.Debugger;
+	public appIsReady: boolean;
 
 	constructor() {
+		this.appIsReady = false;
+		this.debug = getDebug();
+
+		const environemnt = getEnvironment();
+
+		this.debug("Initializing express app");
 		this.app = express();
 
-		this.bootstrapApp()
+		this.bootstrapApp(environemnt)
 			.then(() => {
-				console.log("App bootstrapped!");
+				this.appIsReady = true;
+				this.debug("App bootstrapped!");
 			})
 			.catch((e: any) => {
 				console.error("Something went wrong while bootstrapping", e);
 			});
 	}
 
-	private async bootstrapApp() {
-		const env = getEnvironment();
-		this.setupDi(env);
-		if (env.isDev()) await this.seedDatabaseInDev();
+	private async bootstrapApp(environment: Environment) {
+		this.setupDi(environment);
+		if (environment.isDev()) await this.seedDatabaseInDev();
 		this.setupMiddlewares();
 		this.setupControllers();
 		this.setupAfterMiddlewares();
