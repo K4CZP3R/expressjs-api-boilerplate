@@ -37,7 +37,6 @@ export class AuthController extends BaseController {
 
 	private _registerDisabled: boolean = false;
 
-
 	constructor(private authLogic: AuthLogic = new AuthLogic()) {
 		super({ path: "/auth" });
 		this.loadRoutes();
@@ -51,7 +50,6 @@ export class AuthController extends BaseController {
 	set registerDisabled(value: boolean) {
 		this._registerDisabled = value;
 	}
-
 
 	async pathMe(req: Request, res: Response, next: NextFunction) {
 		let result = await this.authLogic.meData({ user: req["user"] });

@@ -1,9 +1,14 @@
 import { IEnvironment } from "./interfaces/environment.interface";
 import { IDatabaseConfig } from "./interfaces/orm-database-config.interface";
-import { read, readFileSync } from "fs";
+import { existsSync, read, readFileSync } from "fs";
+import { generateKeys } from "../scripts/generate-keys.script";
 
 export class Environment {
-	constructor(public env: IEnvironment) { }
+	constructor(public env: IEnvironment) {}
+
+	async initialize(): Promise<void> {
+		await this.generateKeyPairIfNeeded();
+	}
 
 	getDatabase(): IDatabaseConfig {
 		return {
@@ -20,11 +25,13 @@ export class Environment {
 		return this.env.ENVIRONMENT === "dev";
 	}
 
+	async generateKeyPairIfNeeded(): Promise<void> {
+		if (existsSync(this.env.JWT_KEY_PRIVATE) && existsSync(this.env.JWT_KEY_PUBLIC)) {
+			return;
+		}
 
-
-
-
-
+		return generateKeys(this.env.JWT_KEY_PRIVATE, this.env.JWT_KEY_PUBLIC);
+	}
 
 	getJwkKeyPair(): { private: any; public: any } {
 		return {

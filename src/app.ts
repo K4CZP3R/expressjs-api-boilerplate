@@ -41,6 +41,7 @@ export class App {
 	}
 
 	private async bootstrapApp(environment: Environment) {
+		await environment.initialize();
 		this.setupDi(environment);
 		if (environment.isDev()) await this.seedDatabaseInDev();
 		this.setupMiddlewares();
