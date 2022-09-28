@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, models } from "mongoose";
 import { randomUuid } from "../helpers/mongo.helper";
 import { AccountType } from "./enums/account-type.enum";
 import { AuthType } from "./enums/auth-type.enum";
@@ -30,4 +30,4 @@ const schema = new Schema<IAuth>(
 	{ timestamps: true }
 );
 
-export const AuthModel = model<IAuth>("Auth", schema);
+export const AuthModel = models.Auth || model<IAuth>("Auth", schema);

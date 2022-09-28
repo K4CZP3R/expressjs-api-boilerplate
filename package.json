@@ -4,12 +4,12 @@
   "description": "My own ExpressJS boilerplate with TS",
   "main": "./src/index.ts",
   "scripts": {
-    "dev": "ts-node-dev --respawn --pretty --transpile-only ./src/index.ts",
+    "dev": "DEBUG=eab* ts-node-dev --respawn --pretty --transpile-only ./src/index.ts",
     "try": "ts-node-dev --respawn --pretty --transpile-only ./src/try.ts",
     "generateKeys": "ts-node-dev --respawn --pretty --transpile-only ./src/scripts/generate-keys.script.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:coverage": "jest --coverage"
   },
   "repository": {
@@ -26,9 +26,12 @@
     "@types/jsonwebtoken": "^8.5.6",
     "@types/lodash": "^4.14.177",
     "@types/node": "^16.11.7",
+    "@types/supertest": "^2.0.12",
     "@types/uuid": "^8.3.1",
     "eslint": "^8.2.0",
     "jest": "^27.3.1",
+    "should": "^13.2.3",
+    "supertest": "^6.2.4",
     "ts-jest": "^27.0.7",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.4.4"
@@ -49,8 +52,7 @@
     "pg": "^8.7.1",
     "sha3": "^2.1.4",
     "typeorm": "^0.2.41",
-    "uuid": "^8.3.2",
-    "ws": "^8.4.0"
+    "uuid": "^8.3.2"
   },
   "license": "ISC",
   "bugs": {

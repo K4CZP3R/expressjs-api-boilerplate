@@ -3,6 +3,7 @@ import { IResult } from "../models/interfaces/result.interface";
 import { EmailAuthService } from "../services/email-auth.service";
 import { BaseAuthService } from "../services/base-auth.service";
 import { IUser } from "../models/user.model";
+import { IAuth } from "../models/auth.model";
 
 export class AuthLogic {
 	constructor(private emailAuth = new EmailAuthService(), private baseAuth = new BaseAuthService()) {}
@@ -18,8 +19,11 @@ export class AuthLogic {
 		return await this.emailAuth.authenticate(data);
 	}
 
-	async meData(data: { user: IUser }): Promise<IResult<{ user: IUser }>> {
-		return { success: true, data: { user: data.user } };
+	async meData(data: { user: IUser }): Promise<IResult<{ user: IUser; auth: IAuth }>> {
+		return {
+			success: true,
+			data: { user: data.user, auth: await this.baseAuth.getAuthData({ userId: data.user._id! }) },
+		};
 	}
 
 	async refreshToken(data: { user: IUser }): Promise<IResult<{ accessToken: string; refreshToken: string }>> {
