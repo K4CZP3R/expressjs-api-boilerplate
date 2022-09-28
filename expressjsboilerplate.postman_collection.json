@@ -1,0 +1,404 @@
+{
+	"info": {
+		"_postman_id": "6f7e744d-39cb-4e9f-b550-1d2e84a2a889",
+		"name": "expressjsboilerplate",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19894972"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Email register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"kacper@kacperserewis.net\",\n    \"passwordEncoded\": \"{{passwordEncoded}}\",\n    \"username\": \"Kacper\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/email/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"email",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Email login",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var resData = JSON.parse(responseBody);",
+									"pm.collectionVariables.set(\"refreshToken\", resData.data.refreshToken);",
+									"pm.collectionVariables.set(\"accessToken\", resData.data.accessToken)",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"passwordEncoded\": \"{{passwordEncoded}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/email",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Email refresh",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var resData = JSON.parse(responseBody);",
+									"pm.collectionVariables.set(\"refreshToken\", resData.data.refreshToken);",
+									"pm.collectionVariables.set(\"accessToken\", resData.data.accessToken)",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refreshToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/auth/refresh",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Me",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/auth/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "JWKS",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/auth/jwks",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"jwks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Device pre-register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var resData = JSON.parse(responseBody);",
+									"pm.collectionVariables.set(\"deviceAuthenticationCode\", resData.data.authenticationCode);",
+									"pm.collectionVariables.set(\"deviceApiKey\", resData.data.apiKey);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ownName\": \"Uga buga!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/device/pre-register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"device",
+								"pre-register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Device authorize",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"authenticationCode\": \"{{deviceAuthenticationCode}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/device/authorize",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"device",
+								"authorize"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Device login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"deviceApiKey\": \"{{deviceApiKey}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/device",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"device"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Device pre-register info",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/auth/device/pre-register/info?authenticationCode={{deviceAuthenticationCode}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"device",
+								"pre-register",
+								"info"
+							],
+							"query": [
+								{
+									"key": "authenticationCode",
+									"value": "{{deviceAuthenticationCode}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer"
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://localhost:1337",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "email",
+			"value": "aatest@example.dcom",
+			"type": "string"
+		},
+		{
+			"key": "passwordEncoded",
+			"value": "IVRlc3QxMjM=",
+			"type": "string"
+		},
+		{
+			"key": "apiKey",
+			"value": ""
+		},
+		{
+			"key": "relationName",
+			"value": "My relation",
+			"type": "default"
+		},
+		{
+			"key": "relationId",
+			"value": ""
+		},
+		{
+			"key": "deviceAuthenticationCode",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "deviceApiKey",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
