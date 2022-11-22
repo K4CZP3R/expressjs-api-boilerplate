@@ -11,6 +11,7 @@ export interface IAuth {
 	uniqueData?: {
 		emailPwHash?: string;
 		emailItself?: string;
+		apiKey?: string;
 	};
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -25,6 +26,7 @@ const schema = new Schema<IAuth>(
 		uniqueData: {
 			emailPwHash: { type: String, required: false },
 			emailItself: { type: String, required: false },
+			apiKey: { type: String, required: false }
 		},
 	},
 	{ timestamps: true }

@@ -30,15 +30,12 @@ export class BaseAuthService {
 		return await this.userRepository.getById(data.id);
 	}
 
-	async getAuthData(data: { userId: string }): Promise<IAuth> {
+	async getAuthData(data: { userId: string }): Promise<IAuth[]> {
 
 		let auth = await this.authRepo.getByKey("forUser", data.userId);
 		if (!auth) {
 			throw new Error("Auth not found");
 		}
-
-		delete auth.uniqueData.emailPwHash;
-		// filter out private data
 
 		return auth;
 	}

@@ -1,1 +1,2 @@
 export const JWT_SERVICE = "JWT_SERVICE";
+export const API_KEY_AUTH_SERVICE = "API_KEY_AUTH_SERVICE";

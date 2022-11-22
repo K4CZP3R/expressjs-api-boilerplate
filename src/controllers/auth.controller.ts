@@ -13,13 +13,25 @@ export class AuthController extends BaseController {
 		},
 		{
 			path: "/email/register",
-			method: "POST",
+			method: "GET",
 			func: this.pathEmailRegister.bind(this),
 		},
 		{
 			path: "/email",
 			method: "POST",
 			func: this.pathEmailAuth.bind(this),
+		},
+		{
+			path: "/api-key/register",
+			method: "GET",
+			func: this.pathApiKeyRegister.bind(this),
+			middlewares: [authUserMiddleware]
+		},
+		{
+			path: "/api-key/remove",
+			method: "POST",
+			func: this.pathApiKeyRemove.bind(this),
+			middlewares: [authUserMiddleware]
 		},
 		{
 			path: "/refresh",
@@ -49,6 +61,16 @@ export class AuthController extends BaseController {
 
 	set registerDisabled(value: boolean) {
 		this._registerDisabled = value;
+	}
+
+	async pathApiKeyRemove(req: Request, res: Response, next: NextFunction) {
+		let result = await this.authLogic.removeApiKey({ user: req["user"], apiKey: req.body.apiKey });
+		res.json(result);
+	}
+
+	async pathApiKeyRegister(req: Request, res: Response, next: NextFunction) {
+		let result = await this.authLogic.registerApiKey({ user: req["user"] })
+		res.json(result);
 	}
 
 	async pathMe(req: Request, res: Response, next: NextFunction) {

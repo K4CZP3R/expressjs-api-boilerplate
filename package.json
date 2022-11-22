@@ -5,6 +5,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "dev": "DEBUG=expressjs-api-boilerplate* ts-node-dev --respawn --pretty --transpile-only ./src/index.ts",
+    "dev:win": "set DEBUG=expressjs-api-boilerplate* && ts-node-dev --respawn --pretty --transpile-only ./src/index.ts",
     "try": "ts-node-dev --respawn --pretty --transpile-only ./src/try.ts",
     "generateKeys": "ts-node-dev --respawn --pretty --transpile-only ./src/scripts/generate-keys.script.ts",
     "build": "tsc",
