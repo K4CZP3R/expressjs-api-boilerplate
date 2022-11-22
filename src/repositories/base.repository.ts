@@ -5,14 +5,14 @@ export interface IBaseRepository<T extends { _id?: string }> {
 	getAll(): Promise<T[]>;
 	getById(id: string): Promise<T | undefined>;
 	update(id: string, item: T): Promise<T>;
-	getByKey(key: string, value: any): Promise<T | undefined>;
+	getByKey(key: string, value: any): Promise<T[]>;
 	getWithFilters(filters?: { [key: string]: any }, orderBy?: { [key: string]: number }, limit?: number): Promise<T[]>;
 	getSchemaName(): string;
 	removeAll(): Promise<number>;
 }
 
 export class BaseRepository<T extends { _id?: string }> implements IBaseRepository<T> {
-	constructor(private Model = MongoModel) {}
+	constructor(private Model = MongoModel) { }
 
 	getSchemaName(): string {
 		return this.Model.collection.name;
@@ -55,11 +55,9 @@ export class BaseRepository<T extends { _id?: string }> implements IBaseReposito
 		await this.Model.findByIdAndUpdate(id, item);
 		return this.getById(item._id);
 	}
-	async getByKey(key: string, value: any): Promise<T> {
-		let found = await this.Model.findOne({ [key]: value });
-		if (!found) return undefined;
-
-		return found as T;
+	async getByKey(key: string, value: any): Promise<T[]> {
+		let found = await this.Model.find({ [key]: value });
+		return found ? found as T[] : [];
 	}
 	async getAllByKey(key: string, value: any): Promise<T[]> {
 		let found = await this.Model.find({ [key]: value });
