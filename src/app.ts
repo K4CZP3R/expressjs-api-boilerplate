@@ -5,7 +5,7 @@ import cors from "cors";
 import { IController } from "./models/interfaces/controller.interface";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import { DependencyProviderService } from "./services/dependency-provider.service";
-import { JWT_SERVICE } from "./helpers/di-names.helper";
+import { API_KEY_AUTH_SERVICE, JWT_SERVICE } from "./helpers/di-names.helper";
 import { getEnvironment } from "./helpers/dotenv.helper";
 import { createMongooseConnection } from "./services/mongoose-connection.service";
 import { configToMongoUrl } from "./helpers/mongo.helper";
@@ -13,6 +13,7 @@ import { JwtSessionService } from "./services/jwt-session.service";
 import { Environment } from "./models/environment.model";
 import { AuthController } from "./controllers/auth.controller";
 import { getDebug } from "./helpers/debug.helper";
+import { ApiKeyAuthService } from "./services/api-key-auth.service";
 
 export class App {
 	public app: express.Express;
@@ -64,6 +65,7 @@ export class App {
 		);
 
 		createMongooseConnection(configToMongoUrl(env.getDatabase()));
+		DependencyProviderService.setImpl<ApiKeyAuthService>(API_KEY_AUTH_SERVICE, new ApiKeyAuthService());
 	}
 
 	private setupMiddlewares() {
