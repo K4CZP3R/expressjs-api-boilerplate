@@ -8,40 +8,40 @@ export class AuthController extends BaseController {
 	routes: IRoute[] = [
 		{
 			path: "/jwks",
-			method: "GET",
+			method: "get",
 			func: this.pathJwks.bind(this),
 		},
 		{
 			path: "/email/register",
-			method: "GET",
+			method: "post",
 			func: this.pathEmailRegister.bind(this),
 		},
 		{
 			path: "/email",
-			method: "POST",
+			method: "post",
 			func: this.pathEmailAuth.bind(this),
 		},
 		{
 			path: "/api-key/register",
-			method: "GET",
+			method: "get",
 			func: this.pathApiKeyRegister.bind(this),
-			middlewares: [authUserMiddleware]
+			middlewares: [authUserMiddleware],
 		},
 		{
 			path: "/api-key/remove",
-			method: "POST",
+			method: "post",
 			func: this.pathApiKeyRemove.bind(this),
-			middlewares: [authUserMiddleware]
+			middlewares: [authUserMiddleware],
 		},
 		{
 			path: "/refresh",
-			method: "GET",
+			method: "get",
 			func: this.pathRefresh.bind(this),
 			middlewares: [authRefreshMiddleware],
 		},
 		{
 			path: "/me",
-			method: "GET",
+			method: "get",
 			func: this.pathMe.bind(this),
 			middlewares: [authUserMiddleware],
 		},
@@ -69,7 +69,7 @@ export class AuthController extends BaseController {
 	}
 
 	async pathApiKeyRegister(req: Request, res: Response, next: NextFunction) {
-		let result = await this.authLogic.registerApiKey({ user: req["user"] })
+		let result = await this.authLogic.registerApiKey({ user: req["user"] });
 		res.json(result);
 	}
 

@@ -14,10 +14,12 @@ export class EmailAuthService extends BaseAuthService {
 		email: string;
 		passwordEncoded: string;
 	}): Promise<IResult<{ accessToken: string; refreshToken: string }>> {
-		let auth = await this.authRepo.getByKey("uniqueData.emailItself", data.email);
-		if (!auth) {
+		let auths = await this.authRepo.getByKey("uniqueData.emailItself", data.email);
+		if (!auths || auths.length === 0) {
 			throw new Error("Email/password combination is not valid!");
 		}
+
+		let auth = auths[0];
 
 		if (hashPassword(data.passwordEncoded) !== auth.uniqueData.emailPwHash) {
 			throw new Error("Email/password combination is not valid!");
@@ -40,7 +42,7 @@ export class EmailAuthService extends BaseAuthService {
 
 	async register(data: { email: string; passwordEncoded: string; username: string }): Promise<IResult<string>> {
 		// Check if email is already registered
-		if (await this.authRepo.getByKey("uniqueData.emailItself", data.email)) {
+		if ((await this.authRepo.getByKey("uniqueData.emailItself", data.email)).length > 0) {
 			throw new Error("Email already used!");
 		}
 		// Hash password

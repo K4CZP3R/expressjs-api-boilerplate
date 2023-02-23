@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { AsyncMiddleware } from "../../types/middleware.type";
 
 export interface IRoute {
 	path: string;
-	method: "POST" | "GET" | "PUT" | "DELETE";
-	func: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-	middlewares?: any[];
+	method: "post" | "get" | "put" | "delete";
+	func: AsyncMiddleware;
+	middlewares?: AsyncMiddleware[];
 }
