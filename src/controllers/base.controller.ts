@@ -1,32 +1,28 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router } from "express";
+import { wrapMiddleware, wrapMiddlewares } from "../helpers/middleware.helper";
 import { IController } from "../models/interfaces/controller.interface";
 import { IRoute } from "../models/interfaces/route.interface";
+import { AsyncMiddleware } from "../types/middleware.type";
 
 export class BaseController implements IController {
-	public path: string;
-	public routes: IRoute[] = [];
-	public router: Router = Router();
+	path: string;
+	middlewares?: AsyncMiddleware[];
+	router: Router = Router();
+	routes: IRoute[] = [];
 
-	constructor(config: { path: string }) {
+	constructor(config: { path: string; middlewares?: AsyncMiddleware[] }) {
 		this.path = config.path;
+		this.middlewares = config.middlewares;
 	}
 
-	public loadRoutes(): void {
+	loadRoutes(): void {
 		this.routes.forEach(route => {
 			if (!route.method) {
-				console.warn("Invalid route:", route, " in path:", this.path, "ignoring!");
+				console.log("Invalid route", route, "in path", this.path, "ignoring!");
 				return;
 			}
-
-			this.router[route.method.toLowerCase()](
-				route.path,
-				route.middlewares ? route.middlewares : [],
-				async (req: Request, res: Response, next: NextFunction) => {
-					route.func(req, res, next).catch(error => {
-						next(error);
-					});
-				}
-			);
+			const wrapped = wrapMiddlewares([...(this.middlewares ?? []), ...(route.middlewares ?? [])]);
+			this.router[route.method](route.path, wrapped, wrapMiddleware(route.func));
 		});
 	}
 }
