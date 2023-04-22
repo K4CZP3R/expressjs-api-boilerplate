@@ -8,7 +8,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8180:1337"
-  mongo:
-    image: mongo
+  portgres:
+    image: postgres:12.2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     ports:
-      - "27017:27017"
+      - "5432:5432"
