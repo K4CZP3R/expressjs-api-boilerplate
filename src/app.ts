@@ -5,86 +5,86 @@ import cors from "cors";
 import { IController } from "./models/interfaces/controller.interface";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import { DependencyProviderService } from "./services/dependency-provider.service";
-import { API_KEY_AUTH_SERVICE, JWT_SERVICE } from "./helpers/di-names.helper";
+import { JWT_SERVICE, PRISMA_SERVICE } from "./helpers/di-names.helper";
 import { getEnvironment } from "./helpers/dotenv.helper";
-import { createMongooseConnection } from "./services/mongoose-connection.service";
-import { configToMongoUrl } from "./helpers/mongo.helper";
 import { JwtSessionService } from "./services/jwt-session.service";
-import { Environment } from "./models/environment.model";
 import { AuthController } from "./controllers/auth.controller";
 import { getDebug } from "./helpers/debug.helper";
-import { ApiKeyAuthService } from "./services/api-key-auth.service";
+import { IEnvironment } from "./models/interfaces/environment.interface";
+import { PrismaClient } from "@prisma/client";
+import { UserController } from "./controllers/user.controller";
 
 export class App {
-	public app: express.Express;
+  public app: express.Express;
 
-	private controllers: IController[] = [new AuthController()];
-	debug: debug.Debugger;
-	public appIsReady: boolean;
+  private controllers: IController[] = [
+    new AuthController(),
+    new UserController(),
+  ];
+  debug: debug.Debugger;
+  public appIsReady: boolean;
 
-	constructor() {
-		this.appIsReady = false;
-		this.debug = getDebug();
+  constructor() {
+    this.appIsReady = false;
+    this.debug = getDebug();
 
-		const environemnt = getEnvironment();
+    const environemnt = getEnvironment();
 
-		this.debug("Initializing express app");
-		this.app = express();
+    this.debug("Initializing express app");
+    this.app = express();
 
-		this.bootstrapApp(environemnt)
-			.then(() => {
-				this.appIsReady = true;
-				this.debug("App bootstrapped!");
-			})
-			.catch((e: any) => {
-				console.error("Something went wrong while bootstrapping", e);
-			});
-	}
+    this.bootstrapApp(environemnt)
+      .then(() => {
+        this.appIsReady = true;
+        this.debug("App bootstrapped!");
+      })
+      .catch((e: unknown) => {
+        console.error("Something went wrong while bootstrapping", e);
+      });
+  }
 
-	private async bootstrapApp(environment: Environment) {
-		await environment.initialize();
-		this.setupDi(environment);
-		if (environment.isDev()) await this.seedDatabaseInDev();
-		this.setupMiddlewares();
-		this.setupControllers();
-		this.setupAfterMiddlewares();
-	}
+  private bootstrapApp(environment: IEnvironment): Promise<void> {
+    this.setupDi(environment);
+    this.setupMiddlewares();
+    this.setupControllers();
+    this.setupAfterMiddlewares();
 
-	private setupDi(env: Environment) {
-		let keypair = env.getJwkKeyPair();
-		DependencyProviderService.setImpl<JwtSessionService>(
-			JWT_SERVICE,
-			new JwtSessionService({
-				privateJwk: keypair.private,
-				publicJwk: keypair.public,
-				// expiresIn: 60 * 60 * 24,
-				expiresIn: 60 * 15, // 15 minutes
-				refreshExpiresIn: 60 * 60 * 24 * 7, // 7 days
-				issuer: "KSP",
-			})
-		);
+    return Promise.resolve();
+  }
 
-		createMongooseConnection(configToMongoUrl(env.getDatabase()));
-		DependencyProviderService.setImpl<ApiKeyAuthService>(API_KEY_AUTH_SERVICE, new ApiKeyAuthService());
-	}
+  private setupDi(env: IEnvironment) {
+    DependencyProviderService.setImpl<JwtSessionService>(
+      JWT_SERVICE,
+      new JwtSessionService({
+        jwkEndpoint: env.JWKS_ENDPOINT,
+        audience: env.JWK_AUDIENCE,
+        scopes: env.JWK_SCOPES,
+      })
+    );
 
-	private setupMiddlewares() {
-		this.app.use(helmet());
-		this.app.use(cors());
-		this.app.use(express.json());
-	}
+    DependencyProviderService.setImpl<PrismaClient>(
+      PRISMA_SERVICE,
+      new PrismaClient()
+    );
+  }
 
-	private setupControllers() {
-		this.controllers.forEach(controller => {
-			this.app.use(controller.path, controller.router);
-		});
-	}
+  private setupMiddlewares() {
+    this.app.use(helmet());
+    this.app.use(cors());
+    this.app.use(express.json());
 
-	private setupAfterMiddlewares() {
-		this.app.use(errorMiddleware);
-	}
+    this.app.get("/", (req, res, next) => {
+      next(new Error("Not implemented"));
+    });
+  }
 
-	private async seedDatabaseInDev() {
-		/* Define repos and seed here */
-	}
+  private setupControllers() {
+    this.controllers.forEach(controller => {
+      this.app.use(controller.path, controller.router);
+    });
+  }
+
+  private setupAfterMiddlewares() {
+    this.app.use(errorMiddleware);
+  }
 }
