@@ -1,0 +1,21 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  // provider = "mongodb"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ##############################
+// User
+// ##############################
+
+model User {
+  id String @id @map("_id")
+}
