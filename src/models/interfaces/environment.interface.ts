@@ -1,20 +1,28 @@
+import { z } from "zod";
+
 /**
  * Valid environmental vars from .env
  */
-export interface IEnvironment {
-	ENVIRONMENT: string;
-	SERVER_PORT: number;
-
-	DB_HOST: string;
-	DB_PORT: number;
-	DB_USER: string;
-	DB_PASS: string;
-	DB_NAME: string;
-	DB_URL: string;
-
-	JWT_KEY_PRIVATE: string;
-	JWT_KEY_PUBLIC: string;
+export interface IRawEnvironment {
+  ENVIRONMENT: string;
+  SERVER_PORT: string;
+  DATABASE_URL: string;
+  JWKS_ENDPOINT: string;
+  JWK_AUDIENCE: string;
+  JWK_SCOPES: string;
 }
+
+export const environmentSchema = z.object({
+  ENVIRONMENT: z.enum(["dev", "prod"]),
+  SERVER_PORT: z.string().transform(v => parseInt(v, 10)),
+  DATABASE_URL: z.string(),
+  JWKS_ENDPOINT: z.string(),
+  JWK_AUDIENCE: z.string(),
+  // Jwk scope is a string of comma separated values
+  JWK_SCOPES: z.string().transform(v => v.split(" ")),
+});
+
+export type IEnvironment = z.infer<typeof environmentSchema>;
 
 /**
  * Needed to be able to strip environment from unused properties
@@ -25,15 +33,10 @@ export interface IEnvironment {
  */
 type KeysEnum<T> = { [P in keyof Required<T>]: true };
 export const IEnvironmentKeys: KeysEnum<IEnvironment> = {
-	ENVIRONMENT: true,
-	SERVER_PORT: true,
-	DB_HOST: true,
-	DB_PORT: true,
-	DB_USER: true,
-	DB_PASS: true,
-	DB_NAME: true,
-	DB_URL: true,
-
-	JWT_KEY_PRIVATE: true,
-	JWT_KEY_PUBLIC: true,
+  ENVIRONMENT: true,
+  SERVER_PORT: true,
+  DATABASE_URL: true,
+  JWKS_ENDPOINT: true,
+  JWK_AUDIENCE: true,
+  JWK_SCOPES: true,
 };
